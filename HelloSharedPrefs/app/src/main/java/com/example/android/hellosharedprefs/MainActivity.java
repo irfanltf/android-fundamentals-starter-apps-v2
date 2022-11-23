@@ -15,6 +15,7 @@
  */
 package com.example.android.hellosharedprefs;
 
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -39,6 +40,10 @@ public class MainActivity extends AppCompatActivity {
     private int mColor;
     // Text view to display both count and color
     private TextView mShowCountTextView;
+    private SharedPreferences mPreferenes;
+    private  String sharedPrefFile = "com.example.android.hellosharedprefs";
+
+
 
     // Key for current count
     private final String COUNT_KEY = "count";
@@ -56,17 +61,35 @@ public class MainActivity extends AppCompatActivity {
         mColor = ContextCompat.getColor(this,
                 R.color.default_background);
 
+        mPreferenes = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
+
         // Restore the saved instance state.
-        if (savedInstanceState != null) {
+//        if (savedInstanceState != null) {
+//
+//            mCount = savedInstanceState.getInt(COUNT_KEY);
+//            if (mCount != 0) {
+//                mShowCountTextView.setText(String.format("%s", mCount));
+//            }
+//
+//            mColor = savedInstanceState.getInt(COLOR_KEY);
+//            mShowCountTextView.setBackgroundColor(mColor);
+//        }
 
-            mCount = savedInstanceState.getInt(COUNT_KEY);
-            if (mCount != 0) {
-                mShowCountTextView.setText(String.format("%s", mCount));
-            }
+        mCount = mPreferenes.getInt(COUNT_KEY, 0);
+        mShowCountTextView.setText(String.format("%s", mCount));
+        mColor = mPreferenes.getInt(COLOR_KEY, mColor);
+        mShowCountTextView.setBackgroundColor(mColor);
 
-            mColor = savedInstanceState.getInt(COLOR_KEY);
-            mShowCountTextView.setBackgroundColor(mColor);
-        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences.Editor preferencesEditor = mPreferenes.edit();
+        preferencesEditor.putInt(COUNT_KEY, mCount);
+        preferencesEditor.putInt(COLOR_KEY, mColor);
+        preferencesEditor.apply();
+
     }
 
     /**
@@ -124,5 +147,10 @@ public class MainActivity extends AppCompatActivity {
         mColor = ContextCompat.getColor(this,
                 R.color.default_background);
         mShowCountTextView.setBackgroundColor(mColor);
+
+        // Clear preferences
+        SharedPreferences.Editor preferencesEditor = mPreferenes.edit();
+        preferencesEditor.clear();
+        preferencesEditor.apply();
     }
 }
